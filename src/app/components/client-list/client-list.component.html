@@ -1,19 +1,23 @@
 <div class="container">
   <h2>Liste de mes clients</h2>
-  
-  @if (listClients && listClients.length > 0) {
+
+  <form (ngSubmit)="createClient()" class="create-form">
+    <input name="email" [(ngModel)]="newEmail" placeholder="Client email" />
+    <button type="submit">Create</button>
+  </form>
+
+  <div *ngIf="listClients && listClients.length > 0; else empty">
     <ul>
-      @for (client of listClients; track client.id) {
-        <li>
-          <strong>{{ client.email }}</strong> 
-          (ID: {{ client.id }})
-          <span *ngIf="client.sentiments"> 
-            - {{ client.sentiments.length }} sentiments
-          </span>
-        </li>
-      }
+      <li *ngFor="let client of listClients; trackBy: trackById">
+        <strong>{{ client.email }}</strong>
+        (ID: {{ client.id }})
+        <span *ngIf="client.sentiments"> - {{ client.sentiments.length }} sentiments</span>
+        <button (click)="deleteClient(client.id)">Delete</button>
+      </li>
     </ul>
-  } @else {
+  </div>
+
+  <ng-template #empty>
     <p>Aucun client trouvé pour le moment (La liste est vide).</p>
-  }
+  </ng-template>
 </div>
