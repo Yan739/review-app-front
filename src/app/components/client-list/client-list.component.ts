@@ -14,6 +14,8 @@ import { ClientService } from '../../services/client.service';
 export class ClientList implements OnInit {
   listClients: Client[] = [];
   newEmail = '';
+  editingClientId?: number;
+  editEmail = '';
 
   private clientService = inject(ClientService);
 
@@ -55,5 +57,29 @@ export class ClientList implements OnInit {
 
   trackById(_index: number, item: Client | undefined) {
     return item?.id;
+  }
+
+  startEdit(client?: Client) {
+    if (!client) return;
+    this.editingClientId = client.id;
+    this.editEmail = client.email;
+  }
+
+  cancelEdit() {
+    this.editingClientId = undefined;
+    this.editEmail = '';
+  }
+
+  updateClient() {
+    if (!this.editingClientId) return;
+    const id = this.editingClientId;
+    const payload = { email: this.editEmail };
+    this.clientService.updateClient(id, payload).subscribe({
+      next: () => {
+        this.cancelEdit();
+        this.loadClients();
+      },
+      error: (err: any) => console.error('Error updating client', err)
+    });
   }
 }

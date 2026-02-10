@@ -9,10 +9,18 @@
   <div *ngIf="listClients && listClients.length > 0; else empty">
     <ul>
       <li *ngFor="let client of listClients; trackBy: trackById">
-        <strong>{{ client.email }}</strong>
-        (ID: {{ client.id }})
-        <span *ngIf="client.sentiments"> - {{ client.sentiments.length }} sentiments</span>
-        <button (click)="deleteClient(client.id)">Delete</button>
+        <div *ngIf="editingClientId !== client.id; else editTpl">
+          <strong>{{ client.email }}</strong>
+          (ID: {{ client.id }})
+          <span *ngIf="client.sentiments"> - {{ client.sentiments.length }} sentiments</span>
+          <button (click)="startEdit(client)">Edit</button>
+          <button (click)="deleteClient(client.id)">Delete</button>
+        </div>
+        <ng-template #editTpl>
+          <input [(ngModel)]="editEmail" />
+          <button (click)="updateClient()">Save</button>
+          <button (click)="cancelEdit()">Cancel</button>
+        </ng-template>
       </li>
     </ul>
   </div>
