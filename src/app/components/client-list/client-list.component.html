@@ -1,0 +1,19 @@
+<div class="container">
+  <h2>Liste de mes clients</h2>
+  
+  @if (listClients && listClients.length > 0) {
+    <ul>
+      @for (client of listClients; track client.id) {
+        <li>
+          <strong>{{ client.email }}</strong> 
+          (ID: {{ client.id }})
+          <span *ngIf="client.sentiments"> 
+            - {{ client.sentiments.length }} sentiments
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p>Aucun client trouvé pour le moment (La liste est vide).</p>
+  }
+</div>
