@@ -11,5 +11,5 @@
   "include": [
     "src/**/*.d.ts",
     "src/**/*.spec.ts"
-, "src/app/components/client-list/client-list.component.ts"  ]
+, "src/app/components/client-list/client-list.component.ts", "src/app/tests/sentiment.service.test.ts", "src/app/tests/client.service.test.ts"  ]
 }

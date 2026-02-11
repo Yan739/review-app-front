@@ -1,1 +1,454 @@
-<router-outlet></router-outlet>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewApp – Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --bg: #f6f5f3;
+    --surface: #ffffff;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --text-dim: #a1a1aa;
+    --border: #e4e4e7;
+    --border-hover: #d4d4d8;
+    --hover: #f4f4f5;
+    --accent: #4f46e5;
+    --accent-dark: #4338ca;
+    --accent-subtle: #eef2ff;
+    --accent-glow: rgba(79, 70, 229, .12);
+    --pos: #059669;
+    --pos-subtle: #d1fae5;
+    --neg: #e11d48;
+    --neg-subtle: #ffe4e6;
+    --danger: #dc2626;
+    --danger-subtle: #fee2e2;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-shell { display: flex; height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.25rem;
+    gap: 2.5rem;
+  }
+  .brand { display: flex; align-items: center; gap: .75rem; padding-left: .25rem; }
+  .brand-icon { font-size: 1.5rem; color: var(--accent); line-height: 1; }
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+    letter-spacing: -.02em;
+  }
+  .nav-links { display: flex; flex-direction: column; gap: .375rem; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .6rem .875rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: .875rem;
+    font-weight: 500;
+    transition: all .15s ease;
+    cursor: pointer;
+  }
+  .nav-link:hover { background: var(--hover); color: var(--text); }
+  .nav-link.active { background: var(--accent-subtle); color: var(--accent); }
+  .nav-icon { font-size: 1rem; }
+  .sidebar-footer { margin-top: auto; }
+  .version { font-size: .75rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; overflow-y: auto; padding: 2.5rem 3rem; }
+
+  /* ── PAGE ── */
+  .page { max-width: 740px; }
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -.03em;
+    margin: 0 0 .2rem;
+  }
+  .page-sub { color: var(--text-muted); font-size: .875rem; margin: 0; }
+
+  /* Stats */
+  .stats { display: flex; gap: .75rem; }
+  .stat { font-size: .8rem; font-weight: 600; padding: .35rem .75rem; border-radius: 100px; }
+  .stat.positive { background: var(--pos-subtle); color: var(--pos); }
+  .stat.negative { background: var(--neg-subtle); color: var(--neg); }
+
+  /* Card / Form */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card-label {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-dim);
+    margin: 0 0 .875rem;
+  }
+  .input-row { display: flex; gap: .75rem; align-items: center; }
+  .input-wrap { position: relative; flex: 1; }
+  .input-icon {
+    position: absolute;
+    left: .875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: .875rem;
+    pointer-events: none;
+  }
+  .input {
+    width: 100%;
+    padding: .625rem .875rem .625rem 2rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: .9rem;
+    font-family: inherit;
+    transition: border-color .15s;
+    box-sizing: border-box;
+  }
+  .input.no-icon { padding-left: .875rem; }
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .input.textarea { line-height: 1.5; resize: none; padding-left: .875rem; }
+
+  /* Form grid */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .col-span-2 { grid-column: span 2; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .625rem 1.125rem;
+    border-radius: 8px;
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    border: none;
+    white-space: nowrap;
+    font-family: inherit;
+    justify-content: center;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--hover); color: var(--text); }
+  .btn-sm { padding: .5rem .875rem; font-size: .82rem; }
+  .btn-icon {
+    width: 32px; height: 32px; border-radius: 7px; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; transition: all .15s; background: transparent;
+  }
+  .btn-edit { color: var(--text-muted); }
+  .btn-edit:hover { background: var(--hover); color: var(--text); }
+  .btn-delete { color: var(--text-dim); }
+  .btn-delete:hover { background: var(--danger-subtle); color: var(--danger); }
+
+  /* Client list */
+  .list { display: flex; flex-direction: column; gap: .5rem; }
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .875rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: box-shadow .15s;
+    animation: fadeIn .2s ease both;
+  }
+  .list-item:hover { border-color: var(--border-hover); box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+  .item-info { display: flex; align-items: center; gap: .875rem; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent-subtle); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .9rem; flex-shrink: 0;
+  }
+  .item-email { font-size: .9rem; color: var(--text); font-weight: 500; }
+  .item-id { display: block; font-size: .72rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: .1rem; }
+  .item-actions { display: flex; gap: .25rem; }
+
+  /* Sentiment cards */
+  .sentiment-card {
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 10px;
+    transition: box-shadow .15s;
+    animation: fadeIn .2s ease both;
+  }
+  .sentiment-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+  .sentiment-card.is-positive { border-left-color: var(--pos); }
+  .sentiment-card.is-negative { border-left-color: var(--neg); }
+  .sentiment-top { display: flex; align-items: center; gap: .625rem; margin-bottom: .625rem; }
+  .type-badge { font-size: .72rem; font-weight: 700; padding: .2rem .6rem; border-radius: 100px; text-transform: uppercase; letter-spacing: .06em; }
+  .type-badge.pos { background: var(--pos-subtle); color: var(--pos); }
+  .type-badge.neg { background: var(--neg-subtle); color: var(--neg); }
+  .client-pill { font-size: .78rem; color: var(--text-muted); background: var(--hover); padding: .2rem .6rem; border-radius: 100px; }
+  .ml-auto { margin-left: auto; }
+  .sentiment-text { font-size: .9rem; color: var(--text); line-height: 1.55; margin: 0 0 .5rem; }
+  .sentiment-id { font-size: .7rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  /* Tab switch */
+  .tab-bar { display: flex; gap: .25rem; padding: 0 1.25rem; }
+  .tab {
+    padding: .5rem 1rem;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-radius: 8px 8px 0 0;
+    transition: all .15s;
+    user-select: none;
+  }
+  .tab:hover { background: var(--hover); color: var(--text); }
+  .tab.active { background: var(--accent-subtle); color: var(--accent); font-weight: 600; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name">ReviewApp</span>
+    </div>
+    <div class="nav-links">
+      <div class="nav-link active" onclick="showPage('clients',this)">
+        <span class="nav-icon">⬡</span>
+        <span>Clients</span>
+      </div>
+      <div class="nav-link" onclick="showPage('sentiments',this)">
+        <span class="nav-icon">◎</span>
+        <span>Sentiments</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <span class="version">v1.0</span>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- CLIENTS PAGE -->
+    <div id="page-clients" class="page">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Clients</h1>
+          <p class="page-sub">3 enregistrés</p>
+        </div>
+      </header>
+
+      <div class="card">
+        <p class="card-label">Nouveau client</p>
+        <div class="input-row">
+          <div class="input-wrap">
+            <span class="input-icon">@</span>
+            <input class="input" type="email" placeholder="adresse@email.com" />
+          </div>
+          <button class="btn btn-primary">＋ Ajouter</button>
+        </div>
+      </div>
+
+      <div class="list">
+        <div class="list-item" style="animation-delay:.05s">
+          <div class="item-info">
+            <div class="avatar">A</div>
+            <div>
+              <span class="item-email">alice@example.com</span>
+              <span class="item-id">#1</span>
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="btn-icon btn-edit">✎</button>
+            <button class="btn-icon btn-delete">⌫</button>
+          </div>
+        </div>
+        <div class="list-item" style="animation-delay:.1s">
+          <div class="item-info">
+            <div class="avatar">B</div>
+            <div>
+              <span class="item-email">bob@company.io</span>
+              <span class="item-id">#2</span>
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="btn-icon btn-edit">✎</button>
+            <button class="btn-icon btn-delete">⌫</button>
+          </div>
+        </div>
+        <!-- Edit mode demo -->
+        <div class="list-item" style="border-color: var(--accent); animation-delay:.15s">
+          <div style="display:flex;gap:.625rem;align-items:center;width:100%">
+            <div class="input-wrap" style="flex:1">
+              <span class="input-icon">@</span>
+              <input class="input" value="carol@demo.fr" type="email" />
+            </div>
+            <button class="btn btn-primary btn-sm">Sauver</button>
+            <button class="btn btn-ghost btn-sm">Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENTIMENTS PAGE (hidden) -->
+    <div id="page-sentiments" class="page" style="display:none">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Sentiments</h1>
+          <p class="page-sub">4 avis enregistrés</p>
+        </div>
+        <div class="stats">
+          <span class="stat positive">↑ 3 positifs</span>
+          <span class="stat negative">↓ 1 négatif</span>
+        </div>
+      </header>
+
+      <div class="card">
+        <p class="card-label">Nouvel avis</p>
+        <div class="form-grid">
+          <div class="col-span-2">
+            <textarea class="input textarea" placeholder="Décrivez l'expérience client (10–500 caractères)…" rows="3"></textarea>
+          </div>
+          <select class="input no-icon">
+            <option>😊 Positif</option>
+            <option>😞 Négatif</option>
+          </select>
+          <select class="input no-icon">
+            <option>alice@example.com</option>
+            <option>bob@company.io</option>
+          </select>
+          <button class="btn btn-primary col-span-2">＋ Ajouter l'avis</button>
+        </div>
+      </div>
+
+      <div class="list" style="gap:.625rem">
+        <div class="sentiment-card is-positive" style="animation-delay:.05s">
+          <div class="sentiment-top">
+            <span class="type-badge pos">↑ Positif</span>
+            <span class="client-pill">alice@example.com</span>
+            <div class="item-actions ml-auto">
+              <button class="btn-icon btn-edit">✎</button>
+              <button class="btn-icon btn-delete">⌫</button>
+            </div>
+          </div>
+          <p class="sentiment-text">Excellent service, réponse rapide et très professionnel. Je recommande vivement cette entreprise à tout mon entourage.</p>
+          <span class="sentiment-id">#1</span>
+        </div>
+        <div class="sentiment-card is-negative" style="animation-delay:.1s">
+          <div class="sentiment-top">
+            <span class="type-badge neg">↓ Négatif</span>
+            <span class="client-pill">bob@company.io</span>
+            <div class="item-actions ml-auto">
+              <button class="btn-icon btn-edit">✎</button>
+              <button class="btn-icon btn-delete">⌫</button>
+            </div>
+          </div>
+          <p class="sentiment-text">Délais de livraison trop longs et service client difficile à joindre. Des améliorations sont nécessaires.</p>
+          <span class="sentiment-id">#2</span>
+        </div>
+        <div class="sentiment-card is-positive" style="animation-delay:.15s">
+          <div class="sentiment-top">
+            <span class="type-badge pos">↑ Positif</span>
+            <span class="client-pill">alice@example.com</span>
+            <div class="item-actions ml-auto">
+              <button class="btn-icon btn-edit">✎</button>
+              <button class="btn-icon btn-delete">⌫</button>
+            </div>
+          </div>
+          <p class="sentiment-text">La qualité des produits est vraiment au rendez-vous. Je suis très satisfaite de mon expérience d'achat.</p>
+          <span class="sentiment-id">#3</span>
+        </div>
+        <div class="sentiment-card is-positive" style="animation-delay:.2s">
+          <div class="sentiment-top">
+            <span class="type-badge pos">↑ Positif</span>
+            <span class="client-pill">bob@company.io</span>
+            <div class="item-actions ml-auto">
+              <button class="btn-icon btn-edit">✎</button>
+              <button class="btn-icon btn-delete">⌫</button>
+            </div>
+          </div>
+          <p class="sentiment-text">Interface intuitive et fonctionnalités complètes. Une belle application qui simplifie vraiment la gestion des retours clients.</p>
+          <span class="sentiment-id">#4</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function showPage(name, el) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById('page-' + name).style.display = '';
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

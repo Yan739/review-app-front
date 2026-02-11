@@ -1,1 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f6f5f3;
+  --surface: #ffffff;
+
+  --text: #18181b;
+  --text-muted: #71717a;
+  --text-dim: #a1a1aa;
+
+  --border: #e4e4e7;
+  --border-hover: #d4d4d8;
+
+  --hover: #f4f4f5;
+
+  --accent: #4f46e5;
+  --accent-dark: #4338ca;
+  --accent-subtle: #eef2ff;
+  --accent-glow: rgba(79, 70, 229, .12);
+
+  --pos: #059669;
+  --pos-subtle: #d1fae5;
+
+  --neg: #e11d48;
+  --neg-subtle: #ffe4e6;
+
+  --danger: #dc2626;
+  --danger-subtle: #fee2e2;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+a { text-decoration: none; }

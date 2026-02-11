@@ -1,7 +1,6 @@
 export interface Client {
   id?: number;
   email: string;
-
   sentiments?: Sentiment[];
 }
 
@@ -10,4 +9,5 @@ export interface Sentiment {
   text: string;
   type: 'positive' | 'negative';
   clientId?: number;
+  client?: { id: number };
 }
