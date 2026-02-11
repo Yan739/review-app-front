@@ -111,8 +111,8 @@
   /* Stats */
   .stats { display: flex; gap: .75rem; }
   .stat { font-size: .8rem; font-weight: 600; padding: .35rem .75rem; border-radius: 100px; }
-  .stat.positive { background: var(--pos-subtle); color: var(--pos); }
-  .stat.negative { background: var(--neg-subtle); color: var(--neg); }
+  .stat.POSITIF { background: var(--pos-subtle); color: var(--pos); }
+  .stat.NEGATIF { background: var(--neg-subtle); color: var(--neg); }
 
   /* Card / Form */
   .card {
@@ -232,8 +232,8 @@
     animation: fadeIn .2s ease both;
   }
   .sentiment-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-  .sentiment-card.is-positive { border-left-color: var(--pos); }
-  .sentiment-card.is-negative { border-left-color: var(--neg); }
+  .sentiment-card.is-POSITIF { border-left-color: var(--pos); }
+  .sentiment-card.is-NEGATIF { border-left-color: var(--neg); }
   .sentiment-top { display: flex; align-items: center; gap: .625rem; margin-bottom: .625rem; }
   .type-badge { font-size: .72rem; font-weight: 700; padding: .2rem .6rem; border-radius: 100px; text-transform: uppercase; letter-spacing: .06em; }
   .type-badge.pos { background: var(--pos-subtle); color: var(--pos); }
@@ -364,8 +364,8 @@
           <p class="page-sub">4 avis enregistrés</p>
         </div>
         <div class="stats">
-          <span class="stat positive">↑ 3 positifs</span>
-          <span class="stat negative">↓ 1 négatif</span>
+          <span class="stat POSITIF">↑ 3 positifs</span>
+          <span class="stat NEGATIF">↓ 1 négatif</span>
         </div>
       </header>
 
@@ -388,7 +388,7 @@
       </div>
 
       <div class="list" style="gap:.625rem">
-        <div class="sentiment-card is-positive" style="animation-delay:.05s">
+        <div class="sentiment-card is-POSITIF" style="animation-delay:.05s">
           <div class="sentiment-top">
             <span class="type-badge pos">↑ Positif</span>
             <span class="client-pill">alice@example.com</span>
@@ -400,7 +400,7 @@
           <p class="sentiment-text">Excellent service, réponse rapide et très professionnel. Je recommande vivement cette entreprise à tout mon entourage.</p>
           <span class="sentiment-id">#1</span>
         </div>
-        <div class="sentiment-card is-negative" style="animation-delay:.1s">
+        <div class="sentiment-card is-NEGATIF" style="animation-delay:.1s">
           <div class="sentiment-top">
             <span class="type-badge neg">↓ Négatif</span>
             <span class="client-pill">bob@company.io</span>
@@ -412,7 +412,7 @@
           <p class="sentiment-text">Délais de livraison trop longs et service client difficile à joindre. Des améliorations sont nécessaires.</p>
           <span class="sentiment-id">#2</span>
         </div>
-        <div class="sentiment-card is-positive" style="animation-delay:.15s">
+        <div class="sentiment-card is-POSITIF" style="animation-delay:.15s">
           <div class="sentiment-top">
             <span class="type-badge pos">↑ Positif</span>
             <span class="client-pill">alice@example.com</span>
@@ -424,7 +424,7 @@
           <p class="sentiment-text">La qualité des produits est vraiment au rendez-vous. Je suis très satisfaite de mon expérience d'achat.</p>
           <span class="sentiment-id">#3</span>
         </div>
-        <div class="sentiment-card is-positive" style="animation-delay:.2s">
+        <div class="sentiment-card is-POSITIF" style="animation-delay:.2s">
           <div class="sentiment-top">
             <span class="type-badge pos">↑ Positif</span>
             <span class="client-pill">bob@company.io</span>

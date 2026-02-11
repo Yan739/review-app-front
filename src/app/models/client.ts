@@ -7,7 +7,8 @@ export interface Client {
 export interface Sentiment {
   id?: number;
   text: string;
-  type: 'positive' | 'negative';
-  clientId?: number;
-  client?: { id: number };
+  type: 'POSITIF' | 'NEGATIF';
+  client: {
+    id: number;
+  };
 }

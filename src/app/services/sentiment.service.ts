@@ -2,18 +2,44 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Sentiment } from '../models/client';
 
-const BASE = 'http://localhost:8080/sentiment';
+const BASE = 'http://localhost:8080/api/sentiment';
 
 @Injectable({ providedIn: 'root' })
 export class SentimentService {
   private http = inject(HttpClient);
 
-  getAll()   { return this.http.get<Sentiment[]>(BASE); }
-  create(text: string, type: 'positive' | 'negative', clientId: number) {
-    return this.http.post<Sentiment>(BASE, { text, type, client: { id: clientId } });
+  getAll() {
+    return this.http.get<Sentiment[]>(BASE);
   }
-  update(id: number, text: string, type: 'positive' | 'negative') {
-    return this.http.put<Sentiment>(`${BASE}/${id}`, { text, type });
+
+  create(
+    text: string,
+    type: 'POSITIF' | 'NEGATIF',
+    clientId: number
+  ) {
+    return this.http.post<Sentiment>(BASE, {
+      text,
+      type,
+      client: { id: clientId }
+    });
   }
-  remove(id: number) { return this.http.delete<void>(`${BASE}/${id}`); }
+
+  update(
+    id: number | undefined,
+    text: string,
+    type: 'POSITIF' | 'NEGATIF'
+  ) {
+    if (id == null) {
+      throw new Error('SentimentService.update appelé sans id');
+    }
+
+    return this.http.put<Sentiment>(`${BASE}/${id}`, {
+      text,
+      type
+    });
+  }
+
+  remove(id: number) {
+    return this.http.delete<void>(`${BASE}/${id}`);
+  }
 }

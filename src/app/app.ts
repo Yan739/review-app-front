@@ -94,8 +94,8 @@ type Tab = 'clients' | 'sentiments';
             [(ngModel)]="newText" name="newText"></textarea>
           <div class="field-row">
             <select class="input" [(ngModel)]="newType" name="newType">
-              <option value="positive">Positif</option>
-              <option value="negative">Négatif</option>
+              <option value="POSITIF">Positif</option>
+              <option value="NEGATIF">Négatif</option>
             </select>
             <select class="input" [(ngModel)]="newClientId" name="newClientId">
               <option [ngValue]="undefined" disabled>Client…</option>
@@ -110,13 +110,13 @@ type Tab = 'clients' | 'sentiments';
           <div *ngFor="let s of sentiments()"
             class="row sentiment-row"
             [class.row-editing]="editSentimentId() === s.id"
-            [class.is-pos]="s.type === 'positive'"
-            [class.is-neg]="s.type === 'negative'">
+            [class.is-pos]="s.type === 'POSITIF'"
+            [class.is-neg]="s.type === 'NEGATIF'">
 
             <!-- View -->
             <ng-container *ngIf="editSentimentId() !== s.id">
               <div class="sentiment-body">
-                <span class="type-dot" [class.dot-pos]="s.type === 'positive'" [class.dot-neg]="s.type === 'negative'"></span>
+                <span class="type-dot" [class.dot-pos]="s.type === 'POSITIF'" [class.dot-neg]="s.type === 'NEGATIF'"></span>
                 <span class="row-text">{{ s.text }}</span>
               </div>
               <span class="client-tag">{{ clientEmail(s) }}</span>
@@ -131,8 +131,8 @@ type Tab = 'clients' | 'sentiments';
               <textarea class="input input-inline" rows="2" [(ngModel)]="editTextVal"
                 [name]="'editText-' + s.id" (keyup.escape)="editSentimentId.set(undefined)"></textarea>
               <select class="input" [(ngModel)]="editTypeVal" [name]="'editType-' + s.id">
-                <option value="positive">Positif</option>
-                <option value="negative">Négatif</option>
+                <option value="POSITIF">Positif</option>
+                <option value="NEGATIF">Négatif</option>
               </select>
               <div class="row-actions">
                 <button class="btn-ghost" (click)="saveSentiment(s.id!)">Sauver</button>
@@ -358,15 +358,15 @@ export class AppComponent implements OnInit {
 
   // Sentiment form
   newText      = '';
-  newType: 'positive' | 'negative' = 'positive';
+  newType: 'POSITIF' | 'NEGATIF' = 'POSITIF';
   newClientId?: number;
   editSentimentId = signal<number | undefined>(undefined);
   editTextVal  = '';
-  editTypeVal: 'positive' | 'negative' = 'positive';
+  editTypeVal: 'POSITIF' | 'NEGATIF' = 'POSITIF';
 
   // Computed
-  posCount = computed(() => this.sentiments().filter(s => s.type === 'positive').length);
-  negCount = computed(() => this.sentiments().filter(s => s.type === 'negative').length);
+  posCount = computed(() => this.sentiments().filter(s => s.type === 'POSITIF').length);
+  negCount = computed(() => this.sentiments().filter(s => s.type === 'NEGATIF').length);
 
   // ── Init ─────────────────────────────────────────────────────────────────
   ngOnInit() {
@@ -378,17 +378,27 @@ export class AppComponent implements OnInit {
   loadSentiments() { this.sentimentSvc.getAll().subscribe(v => this.sentiments.set(v)); }
 
   // ── Clients ───────────────────────────────────────────────────────────────
-  addClient() {
+   addClient() {
     const email = this.newEmail.trim();
     if (!email) return;
-    this.clientSvc.create(email).subscribe(() => { this.newEmail = ''; this.loadClients(); });
+
+    this.clientSvc.create(email).subscribe(() => {
+      this.newEmail = '';
+      this.loadClients();
+    });
   }
 
-  startEditClient(c: Client) { this.editClientId.set(c.id); this.editEmailVal = c.email; }
+  startEditClient(c: Client) {
+    if (!c.id) return;
+    this.editClientId.set(c.id);
+    this.editEmailVal = c.email;
+  }
 
   saveClient(id: number) {
-    if (!this.editEmailVal.trim()) return;
-    this.clientSvc.update(id, this.editEmailVal.trim()).subscribe(() => {
+    const email = this.editEmailVal.trim();
+    if (!email) return;
+
+    this.clientSvc.update(id, email).subscribe(() => {
       this.editClientId.set(undefined);
       this.loadClients();
     });
@@ -398,27 +408,41 @@ export class AppComponent implements OnInit {
     this.clientSvc.remove(id).subscribe(() => this.loadClients());
   }
 
+
   // ── Sentiments ────────────────────────────────────────────────────────────
   addSentiment() {
-    if (!this.newText.trim() || !this.newClientId) return;
-    this.sentimentSvc.create(this.newText.trim(), this.newType, this.newClientId).subscribe(() => {
-      this.newText = ''; this.newType = 'positive'; this.newClientId = undefined;
-      this.loadSentiments();
-    });
+    const text = this.newText.trim();
+
+    if (!text || !this.newClientId) return;
+
+    this.sentimentSvc
+      .create(text, this.newType, this.newClientId)
+      .subscribe(() => {
+        this.newText = '';
+        this.newType = 'POSITIF';
+        this.newClientId = undefined;
+        this.loadSentiments();
+      });
   }
 
   startEditSentiment(s: Sentiment) {
+    if (!s.id) return;
+
     this.editSentimentId.set(s.id);
     this.editTextVal = s.text;
     this.editTypeVal = s.type;
   }
 
   saveSentiment(id: number) {
-    if (!this.editTextVal.trim()) return;
-    this.sentimentSvc.update(id, this.editTextVal.trim(), this.editTypeVal).subscribe(() => {
-      this.editSentimentId.set(undefined);
-      this.loadSentiments();
-    });
+    const text = this.editTextVal.trim();
+    if (!text) return;
+
+    this.sentimentSvc
+      .update(id, text, this.editTypeVal)
+      .subscribe(() => {
+        this.editSentimentId.set(undefined);
+        this.loadSentiments();
+      });
   }
 
   removeSentiment(id: number) {
@@ -426,7 +450,9 @@ export class AppComponent implements OnInit {
   }
 
   clientEmail(s: Sentiment): string {
-    const id = s.client?.id ?? s.clientId;
-    return this.clients().find(c => c.id === id)?.email ?? '—';
+    const clientId = s.client?.id;
+    if (!clientId) return '—';
+
+    return this.clients().find(c => c.id === clientId)?.email ?? '—';
   }
 }

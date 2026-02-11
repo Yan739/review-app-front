@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Client } from '../models/client';
 
-const BASE = 'http://localhost:8080/client';
+const BASE = 'http://localhost:8080/api/client';
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {

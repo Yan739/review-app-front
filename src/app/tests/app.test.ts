@@ -9,9 +9,9 @@ const clients: Client[] = [
 ];
 
 const sentiments: Sentiment[] = [
-  { id: 1, text: 'Excellent rapport qualité-prix.', type: 'positive', client: { id: 1 } },
-  { id: 2, text: 'Livraison trop lente cette fois.', type: 'negative', client: { id: 2 } },
-  { id: 3, text: 'Service client très réactif.', type: 'positive', client: { id: 1 } },
+  { id: 1, text: 'Excellent rapport qualité-prix.', type: 'POSITIF', client: { id: 1 } },
+  { id: 2, text: 'Livraison trop lente cette fois.', type: 'NEGATIF', client: { id: 2 } },
+  { id: 3, text: 'Service client très réactif.', type: 'POSITIF', client: { id: 1 } },
 ];
 
 function makeClientSvc(overrides = {}) {
@@ -65,12 +65,12 @@ describe('AppComponent – state logic', () => {
 
   // ── Computed ───────────────────────────────────────────────────────────────
   describe('posCount / negCount', () => {
-    it('counts positive sentiments correctly', async () => {
+    it('counts POSITIF sentiments correctly', async () => {
       const { comp } = await buildComponent();
       expect(comp.posCount()).toBe(2);
     });
 
-    it('counts negative sentiments correctly', async () => {
+    it('counts NEGATIF sentiments correctly', async () => {
       const { comp } = await buildComponent();
       expect(comp.negCount()).toBe(1);
     });
@@ -91,13 +91,13 @@ describe('AppComponent – state logic', () => {
 
     it('falls back to clientId when client object is absent', async () => {
       const { comp } = await buildComponent();
-      const s: Sentiment = { id: 5, text: 'Via flat clientId.', type: 'positive', clientId: 2 };
+      const s: Sentiment = { id: 5, text: 'Via flat clientId.', type: 'POSITIF', client: { id: 2 } };
       expect(comp.clientEmail(s)).toBe('bob@test.com');
     });
 
     it('returns "—" when no matching client', async () => {
       const { comp } = await buildComponent();
-      const s: Sentiment = { id: 9, text: 'Inconnu.', type: 'positive', client: { id: 999 } };
+      const s: Sentiment = { id: 9, text: 'Inconnu.', type: 'POSITIF', client: { id: 999 } };
       expect(comp.clientEmail(s)).toBe('—');
     });
   });
@@ -190,20 +190,20 @@ describe('AppComponent – state logic', () => {
     it('calls create with trimmed text, type and clientId', async () => {
       const { comp, sentimentSvc } = await buildComponent();
       comp.newText = '  Bon produit reçu rapidement.  ';
-      comp.newType = 'positive';
+      comp.newType = 'POSITIF';
       comp.newClientId = 2;
       comp.addSentiment();
-      expect(sentimentSvc.create).toHaveBeenCalledWith('Bon produit reçu rapidement.', 'positive', 2);
+      expect(sentimentSvc.create).toHaveBeenCalledWith('Bon produit reçu rapidement.', 'POSITIF', 2);
     });
 
     it('resets form fields after successful create', async () => {
       const { comp } = await buildComponent();
       comp.newText = 'Texte de test valide ici.';
-      comp.newType = 'negative';
+      comp.newType = 'NEGATIF';
       comp.newClientId = 1;
       comp.addSentiment();
       expect(comp.newText).toBe('');
-      expect(comp.newType).toBe('positive');
+      expect(comp.newType).toBe('POSITIF');
       expect(comp.newClientId).toBeUndefined();
     });
   });
@@ -215,7 +215,7 @@ describe('AppComponent – state logic', () => {
       comp.startEditSentiment(sentiments[0]);
       expect(comp.editSentimentId()).toBe(1);
       expect(comp.editTextVal).toBe(sentiments[0].text);
-      expect(comp.editTypeVal).toBe('positive');
+      expect(comp.editTypeVal).toBe('POSITIF');
     });
 
     it('does not call update when editTextVal is empty', async () => {
@@ -230,9 +230,9 @@ describe('AppComponent – state logic', () => {
       const { comp, sentimentSvc } = await buildComponent();
       comp.startEditSentiment(sentiments[0]);
       comp.editTextVal = '  Avis corrigé et mis à jour.  ';
-      comp.editTypeVal = 'negative';
+      comp.editTypeVal = 'NEGATIF';
       comp.saveSentiment(1);
-      expect(sentimentSvc.update).toHaveBeenCalledWith(1, 'Avis corrigé et mis à jour.', 'negative');
+      expect(sentimentSvc.update).toHaveBeenCalledWith(1, 'Avis corrigé et mis à jour.', 'NEGATIF');
     });
 
     it('clears editSentimentId after save', async () => {

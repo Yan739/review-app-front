@@ -23,8 +23,8 @@ async function buildService(http: ReturnType<typeof makeHttp>) {
 const BASE = 'http://localhost:8080/sentiment';
 
 const mockSentiments: Sentiment[] = [
-  { id: 1, text: 'Excellent service au quotidien.', type: 'positive', client: { id: 1 } },
-  { id: 2, text: 'Délais de livraison trop longs.', type: 'negative', client: { id: 2 } },
+  { id: 1, text: 'Excellent service au quotidien.', type: 'POSITIF', client: { id: 1 } },
+  { id: 2, text: 'Délais de livraison trop longs.', type: 'NEGATIF', client: { id: 2 } },
 ];
 
 describe('SentimentService', () => {
@@ -45,10 +45,10 @@ describe('SentimentService', () => {
     it('calls POST with client nested object – not clientId flat', () => {
       const http = makeHttp({ post: vi.fn().mockReturnValue(of(mockSentiments[0])) });
       buildService(http).then(svc => {
-        svc.create('Très bonne expérience globale.', 'positive', 1).subscribe(() => {
+        svc.create('Très bonne expérience globale.', 'POSITIF', 1).subscribe(() => {
           expect(http.post).toHaveBeenCalledWith(BASE, {
             text: 'Très bonne expérience globale.',
-            type: 'positive',
+            type: 'POSITIF',
             client: { id: 1 },   
           });
         });
@@ -58,7 +58,7 @@ describe('SentimentService', () => {
     it('body does NOT contain a flat clientId field', () => {
       const http = makeHttp({ post: vi.fn().mockReturnValue(of({})) });
       buildService(http).then(svc => {
-        svc.create('Super produit livré rapidement.', 'positive', 7).subscribe(() => {
+        svc.create('Super produit livré rapidement.', 'POSITIF', 7).subscribe(() => {
           const body = (http.post as ReturnType<typeof vi.fn>).mock.calls[0][1];
           expect(body).not.toHaveProperty('clientId');
           expect(body.client).toEqual({ id: 7 });
@@ -71,10 +71,10 @@ describe('SentimentService', () => {
     it('calls PUT /sentiment/:id with text and type', () => {
       const http = makeHttp({ put: vi.fn().mockReturnValue(of(mockSentiments[0])) });
       buildService(http).then(svc => {
-        svc.update(1, 'Texte mis à jour proprement.', 'negative').subscribe(() => {
+        svc.update(1, 'Texte mis à jour proprement.', 'NEGATIF').subscribe(() => {
           expect(http.put).toHaveBeenCalledWith(`${BASE}/1`, {
             text: 'Texte mis à jour proprement.',
-            type: 'negative',
+            type: 'NEGATIF',
           });
         });
       });
