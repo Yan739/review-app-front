@@ -5,7 +5,7 @@ export interface Client {
 }
 
 export interface Sentiment {
-  id?: number;
+  id: number;
   text: string;
   type: 'POSITIF' | 'NEGATIF';
   client: {

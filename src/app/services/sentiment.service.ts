@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs'; // <--- AJOUTER CETTE IMPORTATION
 import type { Sentiment } from '../models/client';
 
 const BASE = 'http://localhost:8080/api/sentiment';
@@ -24,19 +25,12 @@ export class SentimentService {
     });
   }
 
-  update(
-    id: number | undefined,
-    text: string,
-    type: 'POSITIF' | 'NEGATIF'
-  ) {
-    if (id == null) {
-      throw new Error('SentimentService.update appelé sans id');
+  update(id: number, text: string, type: string): Observable<Sentiment> {
+    if (!id) {
+      throw new Error("SentimentService.update appelé sans id");
     }
 
-    return this.http.put<Sentiment>(`${BASE}/${id}`, {
-      text,
-      type
-    });
+    return this.http.put<Sentiment>(`${BASE}/${id}`, { text, type });
   }
 
   remove(id: number) {

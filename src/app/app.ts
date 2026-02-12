@@ -14,8 +14,7 @@ type Tab = 'clients' | 'sentiments';
   imports: [CommonModule, FormsModule, HttpClientModule],
   template: `
   <div class="shell">
-
-    <!-- Header -->
+    <!-- HEADER -->
     <header class="header">
       <div class="header-inner">
         <div class="brand">
@@ -23,10 +22,14 @@ type Tab = 'clients' | 'sentiments';
           <span class="brand-name">Review</span>
         </div>
         <nav class="tabs">
-          <button class="tab" [class.active]="tab() === 'clients'" (click)="tab.set('clients')">
+          <button class="tab"
+                  [class.active]="tab() === 'clients'"
+                  (click)="tab.set('clients')">
             Clients <span class="badge">{{ clients().length }}</span>
           </button>
-          <button class="tab" [class.active]="tab() === 'sentiments'" (click)="tab.set('sentiments')">
+          <button class="tab"
+                  [class.active]="tab() === 'sentiments'"
+                  (click)="tab.set('sentiments')">
             Avis <span class="badge">{{ sentiments().length }}</span>
           </button>
         </nav>
@@ -35,114 +38,122 @@ type Tab = 'clients' | 'sentiments';
 
     <main class="main">
 
-      <!-- ══ CLIENTS ══ -->
+      <!-- ================= CLIENTS ================= -->
       <section *ngIf="tab() === 'clients'" class="section">
 
-        <!-- Form -->
-        <form class="card form-card" (ngSubmit)="addClient()">
+        <form class="card" (ngSubmit)="addClient()">
           <p class="form-label">Ajouter un client</p>
           <div class="field-row">
-            <input class="input" type="email" placeholder="email@domaine.com"
-              [(ngModel)]="newEmail" name="newEmail" autocomplete="off" />
-            <button class="btn-submit" type="submit">Ajouter</button>
+            <input class="input"
+                   type="email"
+                   [(ngModel)]="newEmail"
+                   name="newEmail"
+                   placeholder="email@domaine.com" />
+            <button class="btn-primary" type="submit">Ajouter</button>
           </div>
         </form>
 
-        <!-- List -->
         <div class="list">
-          <div *ngFor="let c of clients()" class="row" [class.row-editing]="editClientId() === c.id">
+          <div *ngFor="let c of clients()"
+               class="row"
+               [class.row-editing]="editClientId() === c.id">
 
-            <!-- View -->
+            <!-- AFFICHAGE -->
             <ng-container *ngIf="editClientId() !== c.id">
               <div class="row-avatar">{{ c.email[0].toUpperCase() }}</div>
               <span class="row-text">{{ c.email }}</span>
               <div class="row-actions">
-                <button class="btn-ghost" (click)="startEditClient(c)">Modifier</button>
-                <button class="btn-danger" (click)="removeClient(c.id!)">×</button>
+                <button class="btn-icon" (click)="startEditClient(c)">✎</button>
+                <button class="btn-icon danger"
+                        (click)="removeClient(c.id!)">🗑</button>
               </div>
             </ng-container>
 
-            <!-- Edit -->
+            <!-- EDITION -->
             <ng-container *ngIf="editClientId() === c.id">
-              <input class="input input-inline" type="email" [(ngModel)]="editEmailVal"
-                [name]="'edit-' + c.id" (keyup.escape)="editClientId.set(undefined)" autofocus />
+              <input class="input input-inline"
+                     [(ngModel)]="editEmailVal"
+                     (keyup.enter)="saveClient(c.id!)"
+                     (keyup.escape)="editClientId.set(undefined)"
+                     autofocus />
               <div class="row-actions">
-                <button class="btn-ghost" (click)="saveClient(c.id!)">Sauver</button>
-                <button class="btn-ghost" (click)="editClientId.set(undefined)">Annuler</button>
+                <button class="btn-icon save"
+                        (click)="saveClient(c.id!)">✓</button>
+                <button class="btn-icon"
+                        (click)="editClientId.set(undefined)">✕</button>
               </div>
             </ng-container>
 
           </div>
-
-          <div *ngIf="clients().length === 0" class="empty">Aucun client enregistré.</div>
         </div>
       </section>
 
-      <!-- ══ SENTIMENTS ══ -->
-      <section *ngIf="tab() === 'sentiments'" class="section">
+      <!-- ================= AVIS ================= -->
+      <section *ngIf="tab() === 'sentiments'" class="sentiments-page">
 
-        <!-- Stats -->
-        <div class="stats-row">
-          <div class="stat-pill pos">↑ {{ posCount() }} positifs</div>
-          <div class="stat-pill neg">↓ {{ negCount() }} négatifs</div>
+        <!-- HEADER -->
+        <div class="sentiments-header">
+          <h2>Avis clients</h2>
+          <div class="sentiments-stats">
+            <span class="stat pos">😊 {{ posCount() }} positifs</span>
+            <span class="stat neg">😞 {{ negCount() }} négatifs</span>
+          </div>
         </div>
 
-        <!-- Form -->
-        <form class="card form-card form-sentiment" (ngSubmit)="addSentiment()">
-          <p class="form-label">Ajouter un avis</p>
-          <textarea class="input" rows="3" placeholder="Décrivez l'expérience (10–500 caractères)…"
-            [(ngModel)]="newText" name="newText"></textarea>
-          <div class="field-row">
-            <select class="input" [(ngModel)]="newType" name="newType">
-              <option value="POSITIF">Positif</option>
-              <option value="NEGATIF">Négatif</option>
+        <!-- AJOUT -->
+        <form class="sentiment-create" (ngSubmit)="addSentiment()">
+          <textarea class="input"
+                    rows="3"
+                    [(ngModel)]="newText"
+                    name="newText"
+                    placeholder="Que pense le client ?">
+          </textarea>
+
+          <div class="create-row">
+            <select class="input"
+                    [(ngModel)]="newClientId"
+                    name="newClientId">
+              <option [ngValue]="undefined" disabled selected>Client</option>
+              <option *ngFor="let c of clients()"
+                      [ngValue]="c.id">{{ c.email }}</option>
             </select>
-            <select class="input" [(ngModel)]="newClientId" name="newClientId">
-              <option [ngValue]="undefined" disabled>Client…</option>
-              <option *ngFor="let c of clients()" [ngValue]="c.id">{{ c.email }}</option>
+
+            <select class="input"
+                    [(ngModel)]="newType"
+                    name="newType">
+              <option value="POSITIF">😊 Positif</option>
+              <option value="NEGATIF">😞 Négatif</option>
             </select>
-            <button class="btn-submit" type="submit">Ajouter</button>
+
+            <button class="btn-primary" type="submit">Publier</button>
           </div>
         </form>
 
-        <!-- List -->
-        <div class="list">
-          <div *ngFor="let s of sentiments()"
-            class="row sentiment-row"
-            [class.row-editing]="editSentimentId() === s.id"
-            [class.is-pos]="s.type === 'POSITIF'"
-            [class.is-neg]="s.type === 'NEGATIF'">
+        <!-- LISTE -->
+        <div class="sentiment-grid">
+          <article *ngFor="let s of sentiments()"
+                  class="sentiment-card"
+                  [class.pos]="s.type === 'POSITIF'"
+                  [class.neg]="s.type === 'NEGATIF'">
 
-            <!-- View -->
-            <ng-container *ngIf="editSentimentId() !== s.id">
-              <div class="sentiment-body">
-                <span class="type-dot" [class.dot-pos]="s.type === 'POSITIF'" [class.dot-neg]="s.type === 'NEGATIF'"></span>
-                <span class="row-text">{{ s.text }}</span>
-              </div>
-              <span class="client-tag">{{ clientEmail(s) }}</span>
-              <div class="row-actions">
-                <button class="btn-ghost" (click)="startEditSentiment(s)">Modifier</button>
-                <button class="btn-danger" (click)="removeSentiment(s.id!)">×</button>
-              </div>
-            </ng-container>
+            <header class="card-header">
+              <span class="badge">
+                {{ s.type === 'POSITIF' ? '😊 Positif' : '😞 Négatif' }}
+              </span>
+              <span class="client">{{ clientEmail(s) }}</span>
+            </header>
 
-            <!-- Edit -->
-            <ng-container *ngIf="editSentimentId() === s.id">
-              <textarea class="input input-inline" rows="2" [(ngModel)]="editTextVal"
-                [name]="'editText-' + s.id" (keyup.escape)="editSentimentId.set(undefined)"></textarea>
-              <select class="input" [(ngModel)]="editTypeVal" [name]="'editType-' + s.id">
-                <option value="POSITIF">Positif</option>
-                <option value="NEGATIF">Négatif</option>
-              </select>
-              <div class="row-actions">
-                <button class="btn-ghost" (click)="saveSentiment(s.id!)">Sauver</button>
-                <button class="btn-ghost" (click)="editSentimentId.set(undefined)">Annuler</button>
-              </div>
-            </ng-container>
+            <p class="card-text">{{ s.text }}</p>
 
-          </div>
+            <footer class="card-actions">
+              <button class="danger"
+                      title="Supprimer"
+                      (click)="removeSentiment(s.id!)">
+                🗑
+              </button>
+            </footer>
 
-          <div *ngIf="sentiments().length === 0" class="empty">Aucun avis enregistré.</div>
+          </article>
         </div>
       </section>
 
@@ -150,309 +161,276 @@ type Tab = 'clients' | 'sentiments';
   </div>
   `,
   styles: [`
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
     :host {
-      --cream:      #f7f3ee;
-      --cream-dark: #ede7dd;
-      --ink:        #1a1714;
-      --ink-soft:   #4a4540;
-      --ink-dim:    #9a948e;
-      --rule:       #ddd7cf;
-      --pos:        #2d6a4f;
-      --pos-bg:     #d8f3dc;
-      --neg:        #9b2335;
-      --neg-bg:     #fde8eb;
-      --accent:     #c17f3a;
-      --accent-bg:  #fdf3e6;
-      font-family: 'Lora', Georgia, serif;
-      color: var(--ink);
-      background: var(--cream);
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --border: #e3e6ea;
+      --ink: #1c1f24;
+      --muted: #6b7280;
+      --pos: #16a34a;
+      --pos-bg: #dcfce7;
+      --neg: #dc2626;
+      --neg-bg: #fee2e2;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
       display: block;
       min-height: 100vh;
+      color: var(--ink);
     }
 
-    /* ── Header ─────────────────────────────────── */
     .header {
-      background: var(--ink);
-      position: sticky; top: 0; z-index: 10;
+      background: #111827;
+      color: white;
+      position: sticky;
+      top: 0;
     }
+
     .header-inner {
-      max-width: 760px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem;
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 1.5rem;
       height: 56px;
-    }
-    .brand { display: flex; align-items: center; gap: .6rem; }
-    .brand-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-    }
-    .brand-name {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.15rem; font-weight: 700;
-      color: #fff; letter-spacing: .04em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    /* ── Tabs ───────────────────────────────────── */
-    .tabs { display: flex; gap: .25rem; }
-    .tab {
-      display: flex; align-items: center; gap: .5rem;
-      padding: .4rem .9rem; border-radius: 4px; border: none;
-      background: transparent; color: rgba(255,255,255,.5);
-      font-family: 'Lora', serif; font-size: .82rem;
-      cursor: pointer; transition: all .15s;
+    .brand-name { font-weight: 600; }
+
+    .tabs .tab {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      margin-left: .5rem;
+      cursor: pointer;
     }
-    .tab:hover { color: rgba(255,255,255,.8); }
-    .tab.active { background: rgba(255,255,255,.1); color: #fff; }
-    .badge {
-      font-size: .68rem; background: rgba(255,255,255,.15);
-      color: rgba(255,255,255,.7); border-radius: 100px;
-      padding: .1rem .4rem; font-family: 'Lora', serif;
+
+    .tabs .active {
+      color: white;
+      font-weight: 600;
     }
-    .tab.active .badge { background: var(--accent); color: #fff; }
 
-    /* ── Main ───────────────────────────────────── */
-    .main { max-width: 760px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-
-    .section { display: flex; flex-direction: column; gap: 1.25rem; }
-
-    /* ── Stats ──────────────────────────────────── */
-    .stats-row { display: flex; gap: .625rem; }
-    .stat-pill {
-      font-size: .78rem; font-weight: 500;
-      padding: .3rem .75rem; border-radius: 100px;
-      font-family: 'Lora', serif;
+    .main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem 1.5rem;
     }
-    .stat-pill.pos { background: var(--pos-bg); color: var(--pos); }
-    .stat-pill.neg { background: var(--neg-bg); color: var(--neg); }
 
-    /* ── Cards / Forms ──────────────────────────── */
+    .section { display: flex; flex-direction: column; gap: 1rem; }
+
     .card {
-      background: #fff; border: 1px solid var(--rule);
-      border-radius: 10px; padding: 1.25rem 1.5rem;
-      box-shadow: 0 1px 4px rgba(26,23,20,.04);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
     }
-    .form-label {
-      font-size: .72rem; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--ink-dim);
-      margin-bottom: .75rem;
-    }
-    .form-sentiment { display: flex; flex-direction: column; gap: .75rem; }
-    .field-row { display: flex; gap: .625rem; align-items: center; }
 
-    /* ── Inputs ─────────────────────────────────── */
     .input {
-      flex: 1; padding: .6rem .875rem;
-      background: var(--cream); border: 1px solid var(--rule);
-      border-radius: 6px; color: var(--ink);
-      font-family: 'Lora', serif; font-size: .9rem;
-      transition: border-color .15s; width: 100%;
+      width: 100%;
+      padding: .6rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
     }
-    .input:focus { outline: none; border-color: var(--accent); }
-    .input.input-inline { background: var(--cream-dark); flex: 1; }
-    select.input { cursor: pointer; }
-    textarea.input { resize: none; line-height: 1.5; }
 
-    /* ── Buttons ────────────────────────────────── */
-    .btn-submit {
-      padding: .6rem 1.25rem; border-radius: 6px; border: none;
-      background: var(--ink); color: #fff;
-      font-family: 'Lora', serif; font-size: .875rem;
-      cursor: pointer; white-space: nowrap;
-      transition: background .15s;
+    .btn-primary {
+      padding: .6rem 1.2rem;
+      background: #111827;
+      color: white;
+      border-radius: 8px;
+      border: none;
     }
-    .btn-submit:hover { background: var(--ink-soft); }
-    .btn-ghost {
-      padding: .45rem .75rem; border-radius: 5px;
-      border: 1px solid var(--rule); background: transparent;
-      color: var(--ink-soft); font-family: 'Lora', serif;
-      font-size: .8rem; cursor: pointer; transition: all .15s;
-      white-space: nowrap;
-    }
-    .btn-ghost:hover { background: var(--cream-dark); color: var(--ink); }
-    .btn-danger {
-      width: 28px; height: 28px; border-radius: 5px; border: none;
-      background: transparent; color: var(--ink-dim);
-      font-size: 1.1rem; cursor: pointer; transition: all .15s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .btn-danger:hover { background: var(--neg-bg); color: var(--neg); }
 
-    /* ── List rows ──────────────────────────────── */
+    /* CLIENTS */
     .list { display: flex; flex-direction: column; gap: .5rem; }
 
     .row {
-      display: flex; align-items: center; gap: .875rem;
-      padding: .875rem 1.25rem;
-      background: #fff; border: 1px solid var(--rule);
-      border-radius: 8px;
-      transition: box-shadow .15s;
-      animation: fadeUp .18s ease both;
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: .75rem;
+      border-radius: 10px;
+      gap: .75rem;
     }
-    .row:hover { box-shadow: 0 2px 10px rgba(26,23,20,.06); }
-    .row-editing { border-color: var(--accent); }
 
     .row-avatar {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-      background: var(--accent-bg); color: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: .9rem;
-    }
-    .row-text {
-      flex: 1; font-size: .9rem; color: var(--ink);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .row-actions { display: flex; align-items: center; gap: .375rem; margin-left: auto; }
-
-    /* ── Sentiment rows ─────────────────────────── */
-    .sentiment-row { align-items: flex-start; flex-wrap: wrap; gap: .625rem; }
-    .is-pos { border-left: 3px solid var(--pos); }
-    .is-neg { border-left: 3px solid var(--neg); }
-
-    .sentiment-body {
-      flex: 1; display: flex; align-items: flex-start; gap: .625rem;
-      min-width: 0;
-    }
-    .type-dot {
-      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: .45rem;
-    }
-    .dot-pos { background: var(--pos); }
-    .dot-neg { background: var(--neg); }
-    .sentiment-body .row-text { white-space: normal; line-height: 1.5; }
-
-    .client-tag {
-      font-size: .72rem; color: var(--ink-dim);
-      background: var(--cream); padding: .2rem .55rem;
-      border-radius: 100px; border: 1px solid var(--rule);
-      white-space: nowrap;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
     }
 
-    /* ── Empty ──────────────────────────────────── */
-    .empty {
-      text-align: center; padding: 3rem;
-      color: var(--ink-dim); font-style: italic; font-size: .9rem;
+    .row-actions {
+      margin-left: auto;
+      display: flex;
+      gap: .3rem;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .btn-icon {
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .danger { color: var(--neg); }
+    .save { color: var(--pos); }
+
+    /* AVIS */
+    .sentiments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sentiments-stats { display: flex; gap: .5rem; }
+
+    .stat {
+      font-size: .75rem;
+      padding: .3rem .6rem;
+      border-radius: 999px;
+    }
+
+    .stat.pos { background: var(--pos-bg); color: var(--pos); }
+    .stat.neg { background: var(--neg-bg); color: var(--neg); }
+
+    .sentiment-create {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .create-row {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .sentiment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5em;
+    }
+
+    .sentiment-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .sentiment-card.pos { border-left: 5px solid var(--pos); }
+    .sentiment-card.neg { border-left: 5px solid var(--neg); }
+
+    .card-header {
+      font-size: .75rem;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+    }
+
+    .card-text {
+      font-size: .95rem;
+      line-height: 1.45;
+    }
+
+    .card-actions,
+    .edit-actions {
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+    }
+
+    .edit-row {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
     }
   `]
 })
 export class AppComponent implements OnInit {
-  private clientSvc   = inject(ClientService);
+  private clientSvc = inject(ClientService);
   private sentimentSvc = inject(SentimentService);
 
-  // ── State ────────────────────────────────────────────────────────────────
-  tab          = signal<Tab>('clients');
-  clients      = signal<Client[]>([]);
-  sentiments   = signal<Sentiment[]>([]);
+  tab = signal<Tab>('clients');
+  clients = signal<Client[]>([]);
+  sentiments = signal<Sentiment[]>([]);
 
-  // Client form
-  newEmail     = '';
+  newEmail = '';
   editClientId = signal<number | undefined>(undefined);
   editEmailVal = '';
 
-  // Sentiment form
-  newText      = '';
+  newText = '';
   newType: 'POSITIF' | 'NEGATIF' = 'POSITIF';
   newClientId?: number;
-  editSentimentId = signal<number | undefined>(undefined);
-  editTextVal  = '';
-  editTypeVal: 'POSITIF' | 'NEGATIF' = 'POSITIF';
 
-  // Computed
   posCount = computed(() => this.sentiments().filter(s => s.type === 'POSITIF').length);
   negCount = computed(() => this.sentiments().filter(s => s.type === 'NEGATIF').length);
 
-  // ── Init ─────────────────────────────────────────────────────────────────
-  ngOnInit() {
-    this.loadClients();
-    this.loadSentiments();
+  ngOnInit() { this.refresh(); }
+
+  refresh() {
+    this.clientSvc.getAll().subscribe(v => this.clients.set(v));
+    this.sentimentSvc.getAll().subscribe(v => this.sentiments.set(v));
   }
 
-  loadClients()    { this.clientSvc.getAll().subscribe(v => this.clients.set(v)); }
-  loadSentiments() { this.sentimentSvc.getAll().subscribe(v => this.sentiments.set(v)); }
-
-  // ── Clients ───────────────────────────────────────────────────────────────
-   addClient() {
-    const email = this.newEmail.trim();
-    if (!email) return;
-
-    this.clientSvc.create(email).subscribe(() => {
-      this.newEmail = '';
-      this.loadClients();
-    });
+  // CLIENTS
+  addClient() {
+    if (!this.newEmail.trim()) return;
+    this.clientSvc.create(this.newEmail)
+      .subscribe(() => { this.newEmail = ''; this.refresh(); });
   }
 
   startEditClient(c: Client) {
-    if (!c.id) return;
     this.editClientId.set(c.id);
     this.editEmailVal = c.email;
   }
 
   saveClient(id: number) {
-    const email = this.editEmailVal.trim();
-    if (!email) return;
-
-    this.clientSvc.update(id, email).subscribe(() => {
-      this.editClientId.set(undefined);
-      this.loadClients();
-    });
+    if (!this.editEmailVal.trim()) return;
+    this.clientSvc.update(id, this.editEmailVal)
+      .subscribe(() => { this.editClientId.set(undefined); this.refresh(); });
   }
 
   removeClient(id: number) {
-    this.clientSvc.remove(id).subscribe(() => this.loadClients());
+    if (confirm('Supprimer ce client ?')) {
+      this.clientSvc.remove(id).subscribe(() => this.refresh());
+    }
   }
 
+  // AVIS
+    addSentiment() {
+      if (!this.newText.trim() || !this.newClientId) return;
 
-  // ── Sentiments ────────────────────────────────────────────────────────────
-  addSentiment() {
-    const text = this.newText.trim();
+      this.sentimentSvc.create(this.newText, this.newType, this.newClientId)
+        .subscribe(() => {
+          this.newText = '';
+          this.newType = 'POSITIF';
+          this.newClientId = undefined;
+          this.refresh();
+        });
+    }
 
-    if (!text || !this.newClientId) return;
+    removeSentiment(id: number) {
+      if (confirm('Supprimer cet avis ?')) {
+        this.sentimentSvc.remove(id).subscribe(() => this.refresh());
+      }
+    }
 
-    this.sentimentSvc
-      .create(text, this.newType, this.newClientId)
-      .subscribe(() => {
-        this.newText = '';
-        this.newType = 'POSITIF';
-        this.newClientId = undefined;
-        this.loadSentiments();
-      });
-  }
-
-  startEditSentiment(s: Sentiment) {
-    if (!s.id) return;
-
-    this.editSentimentId.set(s.id);
-    this.editTextVal = s.text;
-    this.editTypeVal = s.type;
-  }
-
-  saveSentiment(id: number) {
-    const text = this.editTextVal.trim();
-    if (!text) return;
-
-    this.sentimentSvc
-      .update(id, text, this.editTypeVal)
-      .subscribe(() => {
-        this.editSentimentId.set(undefined);
-        this.loadSentiments();
-      });
-  }
-
-  removeSentiment(id: number) {
-    this.sentimentSvc.remove(id).subscribe(() => this.loadSentiments());
-  }
 
   clientEmail(s: Sentiment): string {
-    const clientId = s.client?.id;
-    if (!clientId) return '—';
-
-    return this.clients().find(c => c.id === clientId)?.email ?? '—';
+    return this.clients().find(c => c.id === s.client.id)?.email ?? '—';
   }
 }
