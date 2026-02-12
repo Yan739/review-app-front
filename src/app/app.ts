@@ -240,6 +240,7 @@ type Tab = 'clients' | 'sentiments';
       color: white;
       border-radius: 8px;
       border: none;
+      margin-top: .2rem;
     }
 
     /* CLIENTS */
